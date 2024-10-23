@@ -1,0 +1,19 @@
+log_channel: 
+routes:
+  app1:
+    name: 应用1
+    access_log_channel:   # 缺省使用log_channel配置
+    error_log_channel:    # 缺省使用log_channel配置
+    route: /app1/api/{path}     # 必须，{path}为固定变量
+    middlewares:  # laravel的中间件
+      - Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull
+    proxy_pass: http://localhost:8000/{path} # 必须，{path}为route配置的变量
+    proxy_middelewares: # 代理中间件
+      - Oh86\GW\ProxyMiddlewares\AddRequestHeader:h1,v1
+      - Oh86\GW\ProxyMiddlewares\SetXRealIPHeader
+      - Oh86\GW\ProxyMiddlewares\SetXForwardedForHeader
+    proxy_timeout: 5
+    circuit_breaker:  # {error_period}时间内错误超过{error_threshold}次，触发熔断，熔断时长为{break_period}
+      error_period: 1
+      error_threshold: 5
+      break_period: 5
