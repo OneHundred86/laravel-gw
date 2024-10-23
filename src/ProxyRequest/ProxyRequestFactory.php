@@ -10,7 +10,7 @@ use Oh86\GW\ProxyRequest\Impls\QueryProxyRequest;
 
 class ProxyRequestFactory
 {
-    public static function create(string $contentType, Client $client): ProxyRequestInterface
+    public static function create(?string $contentType, Client $client): ProxyRequestInterface
     {
         $contentType = strtolower($contentType);
 

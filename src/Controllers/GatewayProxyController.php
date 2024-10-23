@@ -20,6 +20,7 @@ class GatewayProxyController extends Controller
     public function proxy(Request $request, RateLimiter $rateLimiter, ?string $path = null)
     {
         $beginTime = microtime(true);
+        $proxyResponse = null;
         $responseStatusCode = null;
 
         try {
@@ -35,7 +36,7 @@ class GatewayProxyController extends Controller
             if ($circuitBreaker) {
                 if (Cache::has("gw_break:$appTag")) {
                     $responseStatusCode = 503;
-                    return Response::create("gw break", $responseStatusCode);
+                    return new Response("gw break", $responseStatusCode);
                 }
             }
 
@@ -67,12 +68,12 @@ class GatewayProxyController extends Controller
 
             $proxyResponse = $proxyRequest->request($request->method(), $proxyPassUrl, $request->all(), $options);
             $responseStatusCode = $proxyResponse->getStatusCode();
-            return Response::create($proxyResponse->getBody()->getContents(), $proxyResponse->getStatusCode(), $proxyResponse->getHeaders());
+            return new Response($proxyResponse->getBody()->getContents(), $proxyResponse->getStatusCode(), $proxyResponse->getHeaders());
         } catch (RequestException $e) {
             $proxyResponse = $e->getResponse();
             if ($proxyResponse) {
                 $responseStatusCode = $proxyResponse->getStatusCode();
-                return Response::create($proxyResponse->getBody()->getContents(), $proxyResponse->getStatusCode(), $proxyResponse->getHeaders());
+                return new Response($proxyResponse->getBody()->getContents(), $proxyResponse->getStatusCode(), $proxyResponse->getHeaders());
             } else {
                 Log::channel($errorLogChannel)->error(__METHOD__, [
                     "url" => $proxyPassUrl,
@@ -88,7 +89,7 @@ class GatewayProxyController extends Controller
                 }
 
                 $responseStatusCode = 502;
-                return Response::create("gw error", $responseStatusCode);
+                return new Response("gw error", $responseStatusCode);
             }
         } finally {
             Log::channel($accessLogChannel)->info(__METHOD__, [

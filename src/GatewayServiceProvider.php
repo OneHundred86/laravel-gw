@@ -26,7 +26,7 @@ class GatewayServiceProvider extends ServiceProvider
             ]);
 
             $this->publishes([
-                __DIR__ . '/config/gw.yaml' => base_path('gw.yaml'),
+                __DIR__ . '/../config/gw.yaml' => base_path('gw.yaml'),
             ]);
         }
     }
