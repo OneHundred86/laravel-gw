@@ -31,18 +31,18 @@ class GatewayProxyController
             $proxyPass = str_replace("{path}", $path, $routeConfig->getProxyPass());
             $circuitBreaker = $routeConfig->getCircuitBreaker();
 
+            if ($request->getQueryString()) {
+                $proxyPassUrl = $proxyPass . "?" . $request->getQueryString();
+            } else {
+                $proxyPassUrl = $proxyPass;
+            }
+            
             // 熔断处理
             if ($circuitBreaker) {
                 if (Cache::has("gw_break:$appTag")) {
                     $responseStatusCode = 503;
                     return new Response("gw break", $responseStatusCode);
                 }
-            }
-
-            if ($request->getQueryString()) {
-                $proxyPassUrl = $proxyPass . "?" . $request->getQueryString();
-            } else {
-                $proxyPassUrl = $proxyPass;
             }
 
             // 代理请求
