@@ -5,7 +5,6 @@ namespace Oh86\GW\Controllers;
 use Oh86\GW\Config\GatewayConfig;
 use Oh86\GW\ProxyRequest\ProxyRequestFactory;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
@@ -15,7 +14,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class GatewayProxyController extends Controller
+class GatewayProxyController
 {
     public function proxy(Request $request, RateLimiter $rateLimiter, ?string $path = null)
     {
