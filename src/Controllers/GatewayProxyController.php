@@ -6,7 +6,9 @@ use Oh86\GW\Config\GatewayConfig;
 use Oh86\GW\ProxyRequest\ProxyRequestFactory;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlHandler;
 use Illuminate\Cache\RateLimiter;
@@ -31,18 +33,18 @@ class GatewayProxyController
             $proxyPass = str_replace("{path}", $path, $routeConfig->getProxyPass());
             $circuitBreaker = $routeConfig->getCircuitBreaker();
 
-            // 熔断处理
-            if ($circuitBreaker) {
-                if (Cache::has("gw_break:$appTag")) {
-                    $responseStatusCode = 503;
-                    return new Response("gw break", $responseStatusCode);
-                }
-            }
-
             if ($request->getQueryString()) {
                 $proxyPassUrl = $proxyPass . "?" . $request->getQueryString();
             } else {
                 $proxyPassUrl = $proxyPass;
+            }
+
+            // 熔断处理
+            if ($circuitBreaker) {
+                if (Cache::has("gw_break:$appTag")) {
+                    $responseStatusCode = 503;
+                    return new Response("gw: break", $responseStatusCode);
+                }
             }
 
             // 代理请求
@@ -68,6 +70,22 @@ class GatewayProxyController
             $proxyResponse = $proxyRequest->request($request->method(), $proxyPassUrl, $request->all(), $options);
             $responseStatusCode = $proxyResponse->getStatusCode();
             return new Response($proxyResponse->getBody()->getContents(), $proxyResponse->getStatusCode(), $proxyResponse->getHeaders());
+        } catch (ConnectException $e) { // eg：1.域名解析出错，2.网络连接失败，3.请求超时
+            Log::channel($errorLogChannel)->error(__METHOD__, [
+                "url" => $proxyPassUrl,
+                "error" => $e->getMessage(),
+            ]);
+
+            // 熔断记录
+            if ($circuitBreaker) {
+                $rateLimiter->hit($appTag, $circuitBreaker['error_period']);
+                if ($rateLimiter->tooManyAttempts($appTag, $circuitBreaker['error_threshold'])) {
+                    Cache::put("gw_break:$appTag", 1, $circuitBreaker['break_period']);
+                }
+            }
+
+            $responseStatusCode = 502;
+            return new Response("gw: bad gateway(1)", $responseStatusCode);
         } catch (RequestException $e) {
             $proxyResponse = $e->getResponse();
             if ($proxyResponse) {
@@ -88,7 +106,7 @@ class GatewayProxyController
                 }
 
                 $responseStatusCode = 502;
-                return new Response("gw error", $responseStatusCode);
+                return new Response("gw: bad gateway(2)", $responseStatusCode);
             }
         } finally {
             Log::channel($accessLogChannel)->info(__METHOD__, [
