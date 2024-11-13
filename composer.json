@@ -11,7 +11,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "symfony/yaml": "^5.2 || ^6.0",
-        "oh86/sm_cryptor": "^1.3",
+        "oh86/sm": "*",
         "guzzlehttp/guzzle": "^7.0 || ^8.0"
     },
     "require-dev": {
