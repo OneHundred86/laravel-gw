@@ -14,7 +14,7 @@ class PrivateRequest extends BaseMiddleware
             $token = sm3($app . $time . $ticket);
             return $request->withHeader("Gw-Private-App", $app)
                 ->withHeader("Gw-Private-Time", $time)
-                ->withHeader("Gw-Private-Token", $token);
+                ->withHeader("Gw-Private-Sign", $token);
         });
     }
 }
