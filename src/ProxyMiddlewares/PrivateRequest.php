@@ -12,9 +12,9 @@ class PrivateRequest extends BaseMiddleware
         return Middleware::mapRequest(function (RequestInterface $request) use ($app, $ticket) {
             $time = time();
             $token = sm3($app . $time . $ticket);
-            return $request->withHeader("Gw-Private-App", $app)
-                ->withHeader("Gw-Private-Time", $time)
-                ->withHeader("Gw-Private-Sign", $token);
+            return $request->withHeader("GW-Private-App", $app)
+                ->withHeader("GW-Private-Time", $time)
+                ->withHeader("GW-Private-Sign", $token);
         });
     }
 }
