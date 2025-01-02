@@ -4,7 +4,7 @@ namespace Oh86\GW\ProxyMiddlewares;
 
 use Illuminate\Http\Request;
 
-class BaseMiddleware
+abstract class AbstractMiddleware
 {
     protected Request $request;
 
@@ -12,4 +12,10 @@ class BaseMiddleware
     {
         $this->request = $request;
     }
+
+    /**
+     * @param mixed $args
+     * @return callable
+     */
+    abstract public function __invoke(...$args);
 }

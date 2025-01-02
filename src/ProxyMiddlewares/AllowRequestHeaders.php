@@ -5,7 +5,7 @@ namespace Oh86\GW\ProxyMiddlewares;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 
-class AllowRequestHeaders extends BaseMiddleware
+class AllowRequestHeaders extends AbstractMiddleware
 {
     /**
      * @param array $headers
