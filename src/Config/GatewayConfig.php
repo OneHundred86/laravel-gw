@@ -16,14 +16,14 @@ class GatewayConfig
      * @throws \Symfony\Component\Yaml\Exception\ParseException
      * @return bool
      */
-    public static function loadConfig(): bool
+    public static function loadConfig(string $configFilePath): bool
     {
         $cacheConfigFile = self::getCacheConfigFilePath();
         if (file_exists($cacheConfigFile)) {
             self::$config = new Repository(include($cacheConfigFile));
         } else {
             try {
-                self::$config = new Repository(self::parseConfig());
+                self::$config = new Repository(self::parseConfig($configFilePath));
             } catch (FileNotFoundException $e) {
                 return false;
             }
@@ -32,10 +32,10 @@ class GatewayConfig
         return true;
     }
 
-    public static function genCacheConfig()
+    public static function genCacheConfig(string $configFilePath)
     {
         $cacheConfigFile = self::getCacheConfigFilePath();
-        $cacheConfig = self::parseConfig();
+        $cacheConfig = self::parseConfig($configFilePath);
 
         file_put_contents($cacheConfigFile, "<?php return " . var_export($cacheConfig, true) . ';');
     }
@@ -55,9 +55,8 @@ class GatewayConfig
      * @throws FileNotFoundException
      * @return array
      */
-    private static function parseConfig()
+    private static function parseConfig($configFilePath)
     {
-        $configFilePath = config('gw.config_file');
         if (!file_exists($configFilePath)) {
             throw new FileNotFoundException($configFilePath . ' does not exists');
         }
@@ -80,7 +79,7 @@ class GatewayConfig
      */
     public static function getRoutes(): Generator
     {
-        foreach (self::$config->get('routes', []) as $appTag => $config) {
+        foreach (self::$config->get('routes') ?? [] as $appTag => $config) {
             yield new RouteConfig($appTag, $config);
         }
     }

@@ -36,7 +36,11 @@ class GatewayServiceProvider extends ServiceProvider
 
     public function parseConfigAndRegisterRoutes()
     {
-        if (GatewayConfig::loadConfig()) {
+        $config = config('gw');
+        $configFilePath = $config['config_file'];
+
+        // 没有配置网关配置文件，则认为不使用网关功能
+        if ($configFilePath && GatewayConfig::loadConfig($configFilePath)) {
             /** @var RouteConfig $routeConfig */
             foreach (GatewayConfig::getRoutes() as $routeConfig) {
                 $r = Route::any($routeConfig->getRoute(), [GatewayProxyController::class, 'proxy'])->where('path', '.*')->name($routeConfig->getAppTag());

@@ -38,7 +38,8 @@ class GatewayCacheConfig extends Command
      */
     public function handle()
     {
-        GatewayConfig::genCacheConfig();
+        $configFilePath = config('gw.config_file');
+        GatewayConfig::genCacheConfig($configFilePath);
         $this->info("gen gateway cache config success");
     }
 }
