@@ -14,22 +14,15 @@ class GatewayConfig
 
     /**
      * @throws \Symfony\Component\Yaml\Exception\ParseException
-     * @return bool
      */
-    public static function loadConfig(string $configFilePath): bool
+    public static function loadConfig(string $configFilePath)
     {
         $cacheConfigFile = self::getCacheConfigFilePath();
         if (file_exists($cacheConfigFile)) {
             self::$config = new Repository(include($cacheConfigFile));
         } else {
-            try {
-                self::$config = new Repository(self::parseConfig($configFilePath));
-            } catch (FileNotFoundException $e) {
-                return false;
-            }
+            self::$config = new Repository(self::parseConfig($configFilePath));
         }
-
-        return true;
     }
 
     public static function genCacheConfig(string $configFilePath)
