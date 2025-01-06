@@ -14,6 +14,8 @@ class GatewayServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__ . '/../config/gw.php', 'gw');
+
         $this->parseConfigAndRegisterRoutes();
     }
 
@@ -26,6 +28,7 @@ class GatewayServiceProvider extends ServiceProvider
             ]);
 
             $this->publishes([
+                __DIR__ . '/../config/gw.php' => config_path('gw.php'),
                 __DIR__ . '/../config/gw.yaml' => base_path('gw.yaml'),
             ]);
         }

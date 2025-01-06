@@ -57,10 +57,11 @@ class GatewayConfig
      */
     private static function parseConfig()
     {
-        if (!file_exists(base_path('gw.yaml'))) {
-            throw new FileNotFoundException(base_path('gw.yaml') . ' does not exists');
+        $configFilePath = config('gw.config_file');
+        if (!file_exists($configFilePath)) {
+            throw new FileNotFoundException($configFilePath . ' does not exists');
         }
-        return Yaml::parseFile(base_path('gw.yaml'));
+        return Yaml::parseFile($configFilePath);
     }
 
 
