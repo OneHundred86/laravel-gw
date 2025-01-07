@@ -54,7 +54,7 @@ class RouteConfig
     }
 
     /**
-     * @return array{string, array}
+     * @return array{string :: 类名, array :: 参数数组}
      * @throws GatewayConfigException
      */
     public function getProxyMiddlewares(): array

@@ -23,9 +23,10 @@ routes:
       - Oh86\GW\ProxyMiddlewares\AddRequestHeader:h1,v1
       - Oh86\GW\ProxyMiddlewares\SetXRealIPHeader
       - Oh86\GW\ProxyMiddlewares\SetXForwardedForHeader
-    proxy_timeout: 5
+      - Oh86\GW\ProxyMiddlewares\PrivateRequest:app1,ticket1
+    proxy_timeout: 10
     circuit_breaker:  # {error_period}时间内错误超过{error_threshold}次，触发熔断，熔断时长为{break_period}
       error_period: 60
       error_threshold: 5
-      break_period: 60
+      break_period: 300
 ```

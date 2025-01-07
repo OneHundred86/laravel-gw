@@ -77,9 +77,13 @@ class GatewayConfig
         }
     }
 
-    public static function getRouteConfig(string $appTag): RouteConfig
+    public static function getRouteConfig(string $appTag): ?RouteConfig
     {
         $config = self::$config->get('routes.' . $appTag);
+        if (!$config) {
+            return null;
+        }
+
         return new RouteConfig($appTag, $config);
     }
 }
