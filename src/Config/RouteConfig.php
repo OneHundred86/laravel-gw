@@ -85,9 +85,9 @@ class RouteConfig
     }
 
     /**
-     * @return array{error_period: int, error_threshold: int, break_period: int}
+     * @return null | array{error_period: int, error_threshold: int, break_period: int}
      */
-    public function getCircuitBreaker(): ?array
+    public function getCircuitBreaker()
     {
         return $this->config['circuit_breaker'] ?? null;
     }

@@ -15,11 +15,11 @@ routes:
     access_log_channel:   # 缺省使用log_channel配置
     error_log_channel:    # 缺省使用log_channel配置
     route: /app1/api/{path}     # 必须，{path}为固定变量
+    proxy_pass: http://localhost:8000/{path} # 必须，{path}为route配置的变量
     middlewares:  # laravel的中间件
       - Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull
-    proxy_pass: http://localhost:8000/{path} # 必须，{path}为route配置的变量
     proxy_middelewares: # 代理中间件
-      - Oh86\GW\ProxyMiddlewares\AllowRequestHeaders:cookie,x-token
+      - Oh86\GW\ProxyMiddlewares\AllowRequestHeaders:cookie,accept
       - Oh86\GW\ProxyMiddlewares\AddRequestHeader:h1,v1
       - Oh86\GW\ProxyMiddlewares\SetXRealIPHeader
       - Oh86\GW\ProxyMiddlewares\SetXForwardedForHeader

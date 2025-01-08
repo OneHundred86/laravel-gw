@@ -4,6 +4,7 @@ namespace Oh86\GW\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Oh86\GW\Config\GatewayConfig;
 use Oh86\GW\ProxyMiddlewares\PrivateRequest;
 use Oh86\Http\Exceptions\ErrorCodeException;
@@ -53,25 +54,30 @@ class ServiceDiscoveryController extends Controller
         $config = GatewayConfig::getRouteConfig($appTag);
 
         if (!$config) {
-            return new OkResponse();
+            return new OkResponse(null);
         }
 
-        /**
-         * @var array{scheme:string, host:string, port:?int, path:string}
-         */
-        $urlArr = parse_url($config->getProxyPass());
-
-        if ($urlArr['port'] ?? false) {
-            $baseUrl = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $urlArr['port'];
+        $proxyPass = $config->getProxyPass();
+        // 没有配置{path}变量，`baseUrl` 取 `proxy_pass`
+        if (!Str::contains($proxyPass, '{path}')) {
+            $baseUrl = $proxyPass;
         } else {
-            $baseUrl = $urlArr['scheme'] . '://' . $urlArr['host'];
+            /**  @var array{scheme:string, host:string, port:?int, path:string} */
+            $urlArr = parse_url($proxyPass);
+
+            if ($urlArr['port'] ?? false) {
+                $baseUrl = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $urlArr['port'];
+            } else {
+                $baseUrl = $urlArr['scheme'] . '://' . $urlArr['host'];
+            }
         }
+
 
         $app = $ticket = null;
         foreach ($config->getProxyMiddlewares() as [$middlewareClass, $middlewareArgs]) {
             if (trim($middlewareClass, '\\') == PrivateRequest::class) {
-                $app = $middlewareArgs[0];
-                $ticket = $middlewareArgs[1];
+                $app = $middlewareArgs[0] ?? '';
+                $ticket = $middlewareArgs[1] ?? '';
             }
         }
 
