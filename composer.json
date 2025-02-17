@@ -13,7 +13,7 @@
         "symfony/yaml": "^5.2 || ^6.0",
         "oh86/sm": "*",
         "guzzlehttp/guzzle": "^7.0 || ^8.0",
-        "oh86/laravel-http-tools": "^1.0"
+        "oh86/laravel-http-tools": "*"
     },
     "require-dev": {
         "laravel/framework": "^7.0||^8.0||^9.0||^10.0||^11.0"
